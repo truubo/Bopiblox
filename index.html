@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
+    <title>BopiBlox</title>
+    <style>
+        :root {
+            --footer-checker: #171717;
+        }
+
+        body {
+            font-family: "Rubik", sans-serif;
+            padding: 0;
+            margin: 0;
+            background-color: #111;
+            background-image: linear-gradient(45deg,var(--footer-checker) 25%,transparent 25%),linear-gradient(-45deg,var(--footer-checker) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,var(--footer-checker) 75%),linear-gradient(-45deg,transparent 75%,var(--footer-checker) 75%);
+            background-position: 0 0,0 60px,60px -60px,-60px 0;
+            background-size: 120px 120px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .corner {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #fff;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #212121;
+            border: 3px solid #3f3f3f;
+            padding: 20px;
+            border-radius: 20px;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }    
+
+        .form {
+            display: flex;
+            gap: 20px;
+        }
+
+        .file-upload {
+            display: inline-block;
+            position: relative;
+        }
+
+        .file-upload input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .error {
+            display: none;
+            background-color: #e43434;
+            border: 3px solid #e76161;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: inline-block;
+            background-color: #9218e3;
+            border: 3px solid #7014ad;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #download {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error">
+        </div>
+        <div class="main">
+            <h1>BopiBlox</h1>
+            <p>Convert Roblox places to Bopimo place format</p>
+                <div class="form">
+                    <div class="file-upload">
+                        <label for="file">Select .rbxlx</label>
+                        <input type="file" name="file" id="file" required>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <a id="download"></a>
+    <div class="corner">
+        <span>created by James</span>
+    </div>
+    <script>
+        const shapes = {
+            "0": "5", 
+            "1": "0", 
+            "2": "2"
+        }
+
+        const colors = { "1": ["242", "243", "243"], "2": ["161", "165", "162"], "3": ["249", "233", "153"], "5": ["215", "197", "154"], "6": ["194", "218", "184"], "9": ["232", "186", "200"], "11": ["128", "187", "219"], "12": ["203", "132", "66"], "18": ["204", "142", "105"], "21": ["196", "40", "28"], "22": ["196", "112", "160"], "23": ["13", "105", "172"], "24": ["245", "205", "48"], "25": ["98", "71", "50"], "26": ["27", "42", "53"], "27": ["109", "110", "108"], "28": ["40", "127", "71"], "29": ["161", "196", "140"], "36": ["243", "207", "155"], "37": ["75", "151", "75"], "38": ["160", "95", "53"], "39": ["193", "202", "222"], "40": ["236", "236", "236"], "41": ["205", "84", "75"], "42": ["193", "223", "240"], "43": ["123", "182", "232"], "44": ["247", "241", "141"], "45": ["180", "210", "228"], "47": ["217", "133", "108"], "48": ["132", "182", "141"], "49": ["248", "241", "132"], "50": ["236", "232", "222"], "100": ["238", "196", "182"], "101": ["218", "134", "122"], "102": ["110", "153", "202"], "103": ["199", "193", "183"], "104": ["107", "50", "124"], "105": ["226", "155", "64"], "106": ["218", "133", "65"], "107": ["0", "143", "156"], "108": ["104", "92", "67"], "110": ["67", "84", "147"], "111": ["191", "183", "177"], "112": ["104", "116", "172"], "113": ["229", "173", "200"], "115": ["199", "210", "60"], "116": ["85", "165", "175"], "118": ["183", "215", "213"], "119": ["164", "189", "71"], "120": ["217", "228", "167"], "121": ["231", "172", "88"], "123": ["211", "111", "76"], "124": ["146", "57", "120"], "125": ["234", "184", "146"], "126": ["165", "165", "203"], "127": ["220", "188", "129"], "128": ["174", "122", "89"], "131": ["156", "163", "168"], "133": ["213", "115", "61"], "134": ["216", "221", "86"], "135": ["116", "134", "157"], "136": ["135", "124", "144"], "137": ["224", "152", "100"], "138": ["149", "138", "115"], "140": ["32", "58", "86"], "141": ["39", "70", "45"], "143": ["207", "226", "247"], "145": ["121", "136", "161"], "146": ["149", "142", "163"], "147": ["147", "135", "103"], "148": ["87", "88", "87"], "149": ["22", "29", "50"], "150": ["171", "173", "172"], "151": ["120", "144", "130"], "153": ["149", "121", "119"], "154": ["123", "46", "47"], "157": ["255", "246", "123"], "158": ["225", "164", "194"], "168": ["117", "108", "98"], "176": ["151", "105", "91"], "178": ["180", "132", "85"], "179": ["137", "135", "136"], "180": ["215", "169", "75"], "190": ["249", "214", "46"], "191": ["232", "171", "45"], "192": ["105", "64", "40"], "193": ["207", "96", "36"], "194": ["163", "162", "165"], "195": ["70", "103", "164"], "196": ["35", "71", "139"], "198": ["142", "66", "133"], "199": ["99", "95", "98"], "200": ["130", "138", "93"], "208": ["229", "228", "223"], "209": ["176", "142", "68"], "210": ["112", "149", "120"], "211": ["121", "181", "181"], "212": ["159", "195", "233"], "213": ["108", "129", "183"], "216": ["144", "76", "42"], "217": ["124", "92", "70"], "218": ["150", "112", "159"], "219": ["107", "98", "155"], "220": ["167", "169", "206"], "221": ["205", "98", "152"], "222": ["228", "173", "200"], "223": ["220", "144", "149"], "224": ["240", "213", "160"], "225": ["235", "184", "127"], "226": ["253", "234", "141"], "232": ["125", "187", "221"], "268": ["52", "43", "117"], "301": ["80", "109", "84"], "302": ["91", "93", "105"], "303": ["0", "16", "176"], "304": ["44", "101", "29"], "305": ["82", "124", "174"], "306": ["51", "88", "130"], "307": ["16", "42", "220"], "308": ["61", "21", "133"], "309": ["52", "142", "64"], "310": ["91", "154", "76"], "311": ["159", "161", "172"], "312": ["89", "34", "89"], "313": ["31", "128", "29"], "314": ["159", "173", "192"], "315": ["9", "137", "207"], "316": ["123", "0", "123"], "317": ["124", "156", "107"], "318": ["138", "171", "133"], "319": ["185", "196", "177"], "320": ["202", "203", "209"], "321": ["167", "94", "155"], "322": ["123", "47", "123"], "323": ["148", "190", "129"], "324": ["168", "189", "153"], "325": ["223", "223", "222"], "327": ["151", "0", "0"], "328": ["177", "229", "166"], "329": ["152", "194", "219"], "330": ["255", "152", "220"], "331": ["255", "89", "89"], "332": ["117", "0", "0"], "333": ["239", "184", "56"], "334": ["248", "217", "109"], "335": ["231", "231", "236"], "336": ["199", "212", "228"], "337": ["255", "148", "148"], "338": ["190", "104", "98"], "339": ["86", "36", "36"], "340": ["241", "231", "199"], "341": ["254", "243", "187"], "342": ["224", "178", "208"], "343": ["212", "144", "189"], "344": ["150", "85", "85"], "345": ["143", "76", "42"], "346": ["211", "190", "150"], "347": ["226", "220", "188"], "348": ["237", "234", "234"], "349": ["233", "218", "218"], "350": ["136", "62", "62"], "351": ["188", "155", "93"], "352": ["199", "172", "120"], "353": ["202", "191", "163"], "354": ["187", "179", "178"], "355": ["108", "88", "75"], "356": ["160", "132", "79"], "357": ["149", "137", "136"], "358": ["171", "168", "158"], "359": ["175", "148", "131"], "360": ["150", "103", "102"], "361": ["86", "66", "54"], "362": ["126", "104", "63"], "363": ["105", "102", "92"], "364": ["90", "76", "66"], "365": ["106", "57", "9"], "1001": ["248", "248", "248"], "1002": ["205", "205", "205"], "1003": ["17", "17", "17"], "1004": ["255", "0", "0"], "1005": ["255", "176", "0"], "1006": ["180", "128", "255"], "1007": ["163", "75", "75"], "1008": ["193", "190", "66"], "1009": ["255", "255", "0"], "1010": ["0", "0", "255"], "1011": ["0", "32", "96"], "1012": ["33", "84", "185"], "1013": ["4", "175", "236"], "1014": ["170", "85", "0"], "1015": ["170", "0", "170"], "1016": ["255", "102", "204"], "1017": ["255", "175", "0"], "1018": ["18", "238", "212"], "1019": ["0", "255", "255"], "1020": ["0", "255", "0"], "1021": ["58", "125", "21"], "1022": ["127", "142", "100"], "1023": ["140", "91", "159"], "1024": ["175", "221", "255"], "1025": ["255", "201", "201"], "1026": ["177", "167", "255"], "1027": ["159", "243", "233"], "1028": ["204", "255", "204"], "1029": ["255", "255", "204"], "1030": ["255", "204", "153"], "1031": ["98", "37", "209"], "1032": ["255", "0", "191"] }
+        
+        function createPart(block_id, uid, color, pos, size, rotation, transparency, cancollide) {
+            let hasTransparency = transparency > 0;
+            transparency = Math.abs((transparency * 10) - 10);
+
+            partTemplate = {
+                "__gdtype": "Dictionary",
+                "pairs": [
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "uid"
+                    },
+                    "value": uid
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_id"
+                    },
+                    "value": block_id
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_name"
+                    },
+                    "value": ""
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_color"
+                    },
+                    "value": {
+                        "__gdtype": "Color",
+                        "values": color
+                    }
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_position"
+                    },
+                    "value": {
+                        "__gdtype": "Vector3",
+                        "values": pos
+                    }
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_rotation"
+                    },
+                    "value": {
+                        "__gdtype": "Vector3",
+                        "values": rotation
+                    }
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_scale"
+                    },
+                    "value": {
+                        "__gdtype": "Vector3",
+                        "values": size
+                    }
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_pattern"
+                    },
+                    "value": 0
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "block_pattern_color"
+                    },
+                    "value": {
+                        "__gdtype": "Color",
+                        "values": [
+                        0,
+                        0,
+                        0,
+                        1
+                        ]
+                    }
+                    },
+                    {
+                    "key": "position_enabled",
+                    "value": false
+                    },
+                    {
+                    "key": "position_points",
+                    "value": {
+                        "__gdtype": "PackedVector3Array",
+                        "values": []
+                    }
+                    },
+                    {
+                    "key": "position_travel_speed",
+                    "value": 5
+                    },
+                    {
+                    "key": "rotation_enabled",
+                    "value": false
+                    },
+                    {
+                    "key": "rotation_pivot_offset",
+                    "value": {
+                        "__gdtype": "Vector3",
+                        "values": [
+                        0,
+                        0,
+                        0
+                        ]
+                    }
+                    },
+                    {
+                    "key": "rotation_direction",
+                    "value": {
+                        "__gdtype": "Vector3",
+                        "values": [
+                        0,
+                        0,
+                        0
+                        ]
+                    }
+                    },
+                    {
+                    "key": "rotation_speed",
+                    "value": 1
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "transparency"
+                    },
+                    "value": transparency
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "collision_enabled"
+                    },
+                    "value": cancollide
+                    },
+                    {
+                    "key": {
+                        "__gdtype": "StringName",
+                        "name": "transparency_enabled"
+                    },
+                    "value": hasTransparency
+                    }
+                ]
+            }
+            return partTemplate
+        }
+
+        function getColor(color) {
+            let colorValues = colors[color];
+            return [colorValues[0] / 255, colorValues[1] / 255, colorValues[2] / 255, 1]
+        }
+
+        function convertToDeg(r00, r01, r02, r10, r11, r12, r20, r21, r22) {
+            // https://www.eecs.qmul.ac.uk/~gslabaugh/publications/euler.pdf
+            if (r12 < 1) {
+                if (r12 > -1) {
+                    x = Math.asin(-r12)
+                    y = Math.atan2(r02, r22)
+                    z = Math.atan2(r10, r11)
+                } else {
+                    x = Math.PI / 2
+                    y = -Math.atan2(-r01, r00)
+                    z = 0
+                }
+            } else {
+                x = -Math.PI / 2
+                y = Math.atan2(-r01, r00)
+                z = 0
+            }
+            return [x * (180 / Math.PI), y * (180 / Math.PI), z * (180 / Math.PI)]
+        }
+
+        document.querySelector("#file").addEventListener("change", (evt) => {
+            let parser = new DOMParser();
+            let reader = new FileReader();
+            let file = evt.target.files[0];
+            if (!["rbxlx", "rbxl"].includes(file.name.split(".").pop())) {
+                document.querySelector(".error").style.display = "block";
+                document.querySelector(".error").innerText = "Invalid file type. Please select a .rbxlx/rbxl file";
+                return
+            } else {
+                document.querySelector(".error").style.display = "none";
+            }
+            let template = {
+                "GAME_VERSION": "1.0.1",
+                "TIME_OF_SAVE": "2024-12-12 00:00:00",
+                "level_blocks": [],
+                "level_death_plane": -1000,
+                "level_description": "",
+                "level_fog_color": {
+                    "__gdtype": "Color",
+                    "values": [
+                    0.501960813999176,
+                    0.501960813999176,
+                    0.501960813999176,
+                    1
+                    ]
+                },
+                "level_fog_distance": 0,
+                "level_fog_enabled": false,
+                "level_gravity": 85,
+                "level_lives": 0,
+                "level_music": {
+                    "__gdtype": "PackedInt32Array",
+                    "values": [
+                    0,
+                    1,
+                    2
+                    ]
+                },
+                "level_name": `${file.name.replace(".rbxlx", "").replace(".rbxl", "")} (converted)`,
+                "level_players_damage_players": true,
+                "level_sky": 9,
+                "level_sky_energy": 1,
+                "level_weather": 0
+            }
+            reader.onload = function(evt) {
+                let array = new Uint8Array(evt.target.result);
+                let data = new TextDecoder("utf-8").decode(array);
+                let place = parser.parseFromString(data, "text/xml");
+                if (place.documentElement.nodeName == 'parsererror') {
+                    document.querySelector(".error").style.display = "block";
+                    document.querySelector(".error").innerText = "Error decoding file. Try saving it as an rbxlx.";
+                    return
+                }
+                place.querySelectorAll("Item").forEach((part) => {
+                    if (["Part", "SpawnLocation"].includes(part.getAttribute("class"))) {
+                        let properties = part.querySelector("Properties");
+                        let color
+                        if (properties.querySelector("int[name=BrickColor]")) {
+                            color = getColor(properties.querySelector("int[name=BrickColor]").textContent);
+                        } else if (properties.querySelector("Color3uint8")) {
+                            hexColor = parseInt(properties.querySelector("Color3uint8").textContent).toString(16).slice(2);
+                            color = [parseInt(hexColor.slice(0, 2), 16) / 255, parseInt(hexColor.slice(2, 4), 16) / 255, parseInt(hexColor.slice(4, 6), 16) / 255, 1]
+                        }
+                        let transparency = parseFloat(properties.querySelector("float[name=Transparency]").textContent) * 10;
+                        let canCollide = properties.querySelector("bool[name=CanCollide]").textContent === "true";
+                        let position = properties.querySelector("CoordinateFrame[name=CFrame]")
+                        let rotation = convertToDeg(
+                            parseFloat(position.querySelector("R00").textContent),
+                            parseFloat(position.querySelector("R01").textContent),
+                            parseFloat(position.querySelector("R02").textContent),
+                            parseFloat(position.querySelector("R10").textContent),
+                            parseFloat(position.querySelector("R11").textContent),
+                            parseFloat(position.querySelector("R12").textContent),
+                            parseFloat(position.querySelector("R20").textContent),
+                            parseFloat(position.querySelector("R21").textContent),
+                            parseFloat(position.querySelector("R22").textContent)
+                        )
+                        position = [
+                            parseFloat(position.querySelector("X").textContent),
+                            parseFloat(position.querySelector("Y").textContent),
+                            parseFloat(position.querySelector("Z").textContent)
+                        ]
+
+                        let size = properties.querySelector("Vector3[name=size]")
+                        size = [
+                            parseFloat(size.querySelector("X").textContent),
+                            parseFloat(size.querySelector("Y").textContent),
+                            parseFloat(size.querySelector("Z").textContent)
+                        ]
+                        let shape
+                        if (part.getAttribute("class") == "SpawnLocation") {
+                            shape = "2002"
+                        } else {
+                            shape = shapes[properties.querySelector("token[name=shape]").textContent]
+                        }
+
+                        template.level_blocks.push(createPart(shape, properties.querySelector("string[name=Name]").textContent, color, position, size, rotation, transparency, canCollide))
+                    }
+                })
+
+                let outputFile = new Blob([JSON.stringify(template)], {type: "application/json"});
+                let url = URL.createObjectURL(outputFile);
+                let a = document.querySelector("#download")
+                a.href = url;
+                a.download = `${file.name.replace(".rbxlx", "").replace(".rbxl", "")}.bopjson`
+                a.click();
+            }
+
+            reader.readAsArrayBuffer(file);
+            // let place = parser.parseFromString(evt.dataTransfer.getData("text/xml"), "text/xml");
+            // console.log(evt.dataTransfer.readData("text/xml"))
+        })
+    </script>
+</body>
+</html>

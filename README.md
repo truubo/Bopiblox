@@ -1,6 +1,6 @@
 
 # Bopiblox
-A tool to convert Roblox places to Bopimo games, contained in a single HTML file.
+A tool to convert Roblox places to Bopimo **LEVELS**, contained in a single HTML file.
 ## Usage
 
  0. Save the Roblox place as .rbxmx
